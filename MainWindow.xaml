@@ -28,7 +28,7 @@
 
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type TextBox}">
+                    <ControlTemplate TargetType="TextBox">
 
                         <Border x:Name="Border" BorderBrush="#FF4ACECA" BorderThickness="1">
                             <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
@@ -41,7 +41,7 @@
                             </Trigger>
 
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#FFFEFEFE" />
+                                <Setter TargetName="Border" Property="Background" Value="#FFEFEFEF" />
                             </Trigger>
 
                         </ControlTemplate.Triggers>
@@ -49,7 +49,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            
+
         </Style>
 
         <Style TargetType="Button">
@@ -59,7 +59,7 @@
             <Setter Property="BorderBrush"  Value="#FF4ACECA" />
 
             <Setter Property="Cursor" Value="Hand" />
-            
+
             <Setter Property="OverridesDefaultStyle" Value="True" />
 
             <Setter Property="Template">
@@ -71,11 +71,41 @@
                         </Border>
 
                         <ControlTemplate.Triggers>
-                            
+
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Border" Property="Background" Value="#FFDBF5F4" />
                             </Trigger>
-                            
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+        </Style>
+
+        <Style TargetType="ListBoxItem">
+
+            <Setter Property="Padding" Value="4,4,4,4" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+
+                        <Border x:Name="Border" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter />
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFF4FCFC" />
+                            </Trigger>
+
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFDBF5F4" />
+                            </Trigger>
+
                         </ControlTemplate.Triggers>
 
                     </ControlTemplate>
@@ -88,22 +118,27 @@
 
     <Grid Background="#FFFAFAFA">
 
-        <Grid Margin="10,190,0,10" MinWidth="150" Background="White" HorizontalAlignment="Left" Width="450">
+        <Grid Margin="10,190,0,55" MinWidth="150" Background="White" HorizontalAlignment="Left" Width="450">
             <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
             <TextBox x:Name="TextBox_Width" HorizontalAlignment="Left" Height="35" Margin="10,42,0,0" VerticalAlignment="Top" Width="90" Text="100" />
             <Label Content="Width" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
             <TextBox x:Name="TextBox_Height" HorizontalAlignment="Left" Height="35" Margin="105,42,0,0" VerticalAlignment="Top" Width="90" Text="100"/>
             <Label Content="Height" HorizontalAlignment="Left" Margin="105,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
-            <CheckBox x:Name="CheckBox_Resize" Content="Resize Images" HorizontalAlignment="Left" Margin="10,82,0,0" VerticalAlignment="Top" Checked="CheckBox_Resize_CheckedChanged" IsChecked="True" Unchecked="CheckBox_Resize_CheckedChanged"/>
-            <Button x:Name="Button_Compress" Content="Compress" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="35" Click="Button_Compress_Click"/>
+            <CheckBox x:Name="CheckBox_Resize" Content="Resize Images" HorizontalAlignment="Left" Margin="200,61,0,0" VerticalAlignment="Top" Checked="CheckBox_Resize_CheckedChanged" IsChecked="True" Unchecked="CheckBox_Resize_CheckedChanged"/>
+            <Grid Margin="10,82,10,10">
+                <Rectangle Fill="White" Stroke="#FFDBF5F4"/>
+                <Label Content="Image Preview" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" VerticalAlignment="Top" />
+                <Image x:Name="Image_Preview" Margin="10,42,10,10" Stretch="None"/>
+            </Grid>
         </Grid>
 
         <Grid Margin="465,10,10,55" Background="White">
             <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
-            <ListBox x:Name="ListBox_Items" Margin="10,42,10,10" BorderBrush="#FF4ACECA" ItemsSource="{Binding}">
+            <ListBox x:Name="ListBox_Items" Margin="10,42,10,10" BorderBrush="#FF4ACECA" ItemsSource="{Binding}" SelectionMode="Extended" SelectionChanged="ListBox_Items_SelectionChanged">
                 <ListBox.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Disable Selected File"></MenuItem>
+                        <MenuItem Header="Enable Selected Files"></MenuItem>
+                        <MenuItem Header="Disable Selected Files"></MenuItem>
                     </ContextMenu>
                 </ListBox.ContextMenu>
 
@@ -130,9 +165,14 @@
             <Button x:Name="Button_OutputDirectory" Content="..." Margin="405,42,10,10" Click="Button_OutputDirectory_Click"/>
         </Grid>
 
-        <Grid Margin="465,0,10,10" MinWidth="150" Background="White" Height="40" VerticalAlignment="Bottom">
+        <Grid Margin="465,0,10,10" Background="White" Height="40" VerticalAlignment="Bottom">
             <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
             <Label x:Name="Label_Message" Content="Choose a folder containing images to compress." HorizontalContentAlignment="Right" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,8,0"/>
+        </Grid>
+
+        <Grid Margin="10,0,0,10" Background="White" Height="40" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="450">
+            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
+            <Button x:Name="Button_Compress" Content="Compress and Resize" VerticalAlignment="Bottom" Height="40" Click="Button_Compress_Click"/>
         </Grid>
 
     </Grid>
