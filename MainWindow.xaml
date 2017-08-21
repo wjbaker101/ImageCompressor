@@ -1,0 +1,139 @@
+﻿<Window x:Class="ImageCompressor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageCompressor"
+        mc:Ignorable="d"
+        Title="Image Compressor" Height="576" Width="1024" WindowStartupLocation="CenterScreen" FontFamily="Verdana Pro" FontSize="14">
+    <Window.Resources>
+
+        <Color x:Key="Theme-l5">#FFF4FCFC</Color>
+        <Color x:Key="Theme-l4">#FFDBF5F4</Color>
+        <Color x:Key="Theme-l3">#FFB7EBEA</Color>
+        <Color x:Key="Theme-l2">#FF93E1DF</Color>
+        <Color x:Key="Theme-l1">#FF6FD8D4</Color>
+        <Color x:Key="Theme">#FF4ACECA</Color>
+        <Color x:Key="Theme-d1">#FF36C6C1</Color>
+        <Color x:Key="Theme-d2">#FF30B0AC</Color>
+        <Color x:Key="Theme-d3">#FF2A9A96</Color>
+        <Color x:Key="Theme-d4">#FF248481</Color>
+        <Color x:Key="Theme-d5">#FF1E6E6B</Color>
+
+        <Style TargetType="TextBox">
+
+            <Setter Property="TextWrapping" Value="NoWrap" />
+
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+
+                        <Border x:Name="Border" BorderBrush="#FF4ACECA" BorderThickness="1">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#FF248481" />
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#FFFEFEFE" />
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            
+        </Style>
+
+        <Style TargetType="Button">
+
+            <Setter Property="Background" Value="#FFFFFFFF" />
+
+            <Setter Property="BorderBrush"  Value="#FF4ACECA" />
+
+            <Setter Property="Cursor" Value="Hand" />
+            
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+
+                        <Border x:Name="Border" BorderThickness="1" Background="#FFFFFFFF" BorderBrush="#FF4ACECA">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFDBF5F4" />
+                            </Trigger>
+                            
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Background="#FFFAFAFA">
+
+        <Grid Margin="10,190,0,10" MinWidth="150" Background="White" HorizontalAlignment="Left" Width="450">
+            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
+            <TextBox x:Name="TextBox_Width" HorizontalAlignment="Left" Height="35" Margin="10,42,0,0" VerticalAlignment="Top" Width="90" Text="100" />
+            <Label Content="Width" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
+            <TextBox x:Name="TextBox_Height" HorizontalAlignment="Left" Height="35" Margin="105,42,0,0" VerticalAlignment="Top" Width="90" Text="100"/>
+            <Label Content="Height" HorizontalAlignment="Left" Margin="105,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
+            <CheckBox x:Name="CheckBox_Resize" Content="Resize Images" HorizontalAlignment="Left" Margin="10,82,0,0" VerticalAlignment="Top" Checked="CheckBox_Resize_CheckedChanged" IsChecked="True" Unchecked="CheckBox_Resize_CheckedChanged"/>
+            <Button x:Name="Button_Compress" Content="Compress" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="35" Click="Button_Compress_Click"/>
+        </Grid>
+
+        <Grid Margin="465,10,10,55" Background="White">
+            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
+            <ListBox x:Name="ListBox_Items" Margin="10,42,10,10" BorderBrush="#FF4ACECA" ItemsSource="{Binding}">
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Disable Selected File"></MenuItem>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"></TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Label Content="Images" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top"/>
+        </Grid>
+
+        <Grid Margin="10,10,0,0" MinWidth="150" HorizontalAlignment="Left" Width="450" Height="85" VerticalAlignment="Top">
+            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
+            <Label Content="Input Directory" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold"/>
+            <TextBox x:Name="TextBox_InputDirectory" Margin="10,42,50,10" />
+            <Button x:Name="Button_InputDirectory" Content="..." Margin="405,42,10,10" Click="Button_InputDirectory_Click"/>
+        </Grid>
+
+        <Grid Margin="10,100,0,0" MinWidth="150" HorizontalAlignment="Left" Width="450" Height="85" VerticalAlignment="Top">
+            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
+            <Label Content="Output Directory" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold" />
+            <TextBox x:Name="TextBox_OutputDirectory" Margin="10,42,50,10" />
+            <Button x:Name="Button_OutputDirectory" Content="..." Margin="405,42,10,10" Click="Button_OutputDirectory_Click"/>
+        </Grid>
+
+        <Grid Margin="465,0,10,10" MinWidth="150" Background="White" Height="40" VerticalAlignment="Bottom">
+            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
+            <Label x:Name="Label_Message" Content="Choose a folder containing images to compress." HorizontalContentAlignment="Right" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,8,0"/>
+        </Grid>
+
+    </Grid>
+</Window>
