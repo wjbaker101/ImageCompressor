@@ -1,39 +1,34 @@
-﻿using System;
+﻿using ImageCompressor.Main.Compressors;
+using ImageCompressor.Main.Files;
+using ImageCompressor.Main.Utilities;
+using Ookii.Dialogs.Wpf;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Ookii.Dialogs.Wpf;
-using System.IO;
-using ImageCompressor.Main.Compressors;
-using System.Windows.Media.Imaging;
-using ImageCompressor.Main.Utilities;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using TinifyAPI;
 
 namespace ImageCompressor
 {
     public partial class MainWindow : Window
     {
-        private readonly string API_KEY = "Yk8o9Lni6nYdv3vmc7j5cpAalBufDc_l";
+        private static readonly string API_KEY = "Yk8o9Lni6nYdv3vmc7j5cpAalBufDc_l";
 
-        private TinifyCompressor compressor;
+        private TinifyCompressor compressor = new TinifyCompressor(API_KEY);
 
-        private List<FileInfo> filesToCompress;
+        private List<AppFile> filesToCompress = new List<AppFile>();
 
-        private int compressCount = 0;
-
-        private long sizeBefore = 0,
-                     sizeAfter = 0;
+        private int compressCount = 0,
+                    maxCompressCount = 0;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            compressor = new TinifyCompressor(API_KEY);
-
-            filesToCompress = new List<FileInfo>();
         }
 
         private void Button_InputDirectory_Click(object sender, RoutedEventArgs e)
@@ -44,10 +39,7 @@ namespace ImageCompressor
             {
                 TextBox_InputDirectory.Text = folderDialog.SelectedPath;
 
-                if (TextBox_OutputDirectory.Text.Length == 0)
-                {
-                    TextBox_OutputDirectory.Text = folderDialog.SelectedPath + @"\compressed";
-                }
+                TextBox_OutputDirectory.Text = folderDialog.SelectedPath + @"\compressed";
 
                 DisplayFiles();
             }
@@ -70,11 +62,19 @@ namespace ImageCompressor
             if (!directory.Exists)
                 return;
 
-            filesToCompress = directory.GetFiles().Where(n => n.Extension == ".jpg" || n.Extension == ".jpeg" || n.Extension == ".png").ToList();
+            filesToCompress.Clear();
+
+            directory.GetFiles()
+                     .Where(n => n.Extension == ".jpg" || n.Extension == ".jpeg" || n.Extension == ".png")
+                     .ToList()
+                     .ForEach(file =>
+                     {
+                         filesToCompress.Add(new AppFile(file, TextBox_OutputDirectory.Text));
+                     });
 
             ListBox_Items.ItemsSource = filesToCompress;
 
-            ShowMessage("Found " + filesToCompress.Count + (filesToCompress.Count == 1 ? " image" : " images."), MessageType.SUCCESS);
+            ShowMessage(MessageDictionary.GetFoundMessage(filesToCompress.Count), MessageType.SUCCESS);
         }
 
         private void CheckBox_Resize_CheckedChanged(object sender, RoutedEventArgs e)
@@ -98,7 +98,7 @@ namespace ImageCompressor
 
         private async void Button_Compress_Click(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(TextBox_InputDirectory.Text))
+            if (TextBox_InputDirectory.Text.Length == 0 || !Directory.Exists(TextBox_InputDirectory.Text))
             {
                 TextBox_InputDirectory.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
                 ShowMessage("Input directory does not exist.", MessageType.ERROR);
@@ -143,27 +143,25 @@ namespace ImageCompressor
                 }
             }
 
+            maxCompressCount = filesToCompress.Count(file => file.Enabled);
+
+            if (maxCompressCount == 0)
+            {
+                ShowMessage("There are no images to compress.", MessageType.ERROR);
+                return;
+            }
+
             MessageBoxResult result = MessageBox.Show("Confirm action.", "Confirm...", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
 
             if (result == MessageBoxResult.Yes)
             {
-                compressCount = 0;
-
-                sizeBefore = 0;
-                filesToCompress.ForEach(file => sizeBefore += file.Length);
-
-                Image_Preview.Source = null;
+                PreExecution();
 
                 try
                 {
-                    if (CheckBox_Resize.IsChecked.Value)
-                    {
-                        await ResizeImages();
-                    }
-                    else
-                    {
-                        await CompressImages();
-                    }
+                    await AlterImagesAsync(CheckBox_Resize.IsChecked.Value);
+
+                    PostExecution();
                 }
                 catch (AccountException ex)
                 {
@@ -188,62 +186,76 @@ namespace ImageCompressor
             }
         }
 
-        private async Task ResizeImages()
+        private void PreExecution()
         {
-            var resizeTasks = new List<Task>();
+            compressCount = 1;
 
-            string fileName = "",
-                   destination = "";
-            
+            Image_Preview.Source = null;
+
+            ListBox_Items.IsEnabled = false;
+        }
+
+        private void PostExecution()
+        {
+            ListBox_Items.IsEnabled = true;
+        }
+
+        private async Task AlterImagesAsync(bool doResize)
+        {
+            List<Task> alterTasks = new List<Task>();
+
             int width = Convert.ToInt32(TextBox_Width.Text),
                 height = Convert.ToInt32(TextBox_Height.Text);
 
             filesToCompress.ForEach(file =>
             {
-                fileName = file.FullName;
-                destination = TextBox_OutputDirectory.Text + @"\" + file.Name;
+                if (file.Enabled)
+                {
+                    if (doResize)
+                    {
+                        alterTasks.Add(ResizeImageAsync(file, width, height));
+                    }
+                    else
+                    {
+                        alterTasks.Add(CompressImageAsync(file));
+                    }
 
-                resizeTasks.Add(ResizeImage(fileName, destination, width, height));
+                    Task.Delay(10);
+                }
             });
 
-            await Task.WhenAll(resizeTasks);
+            await Task.WhenAll(alterTasks);
         }
 
-        private async Task ResizeImage(string sourceLocation, string destinationFile, int width, int height)
+        private async Task ResizeImageAsync(AppFile file, int width, int height)
         {
-            await compressor.ResizeAndCompressImageAsync(sourceLocation, destinationFile, width, height);
+            await compressor.ResizeAndCompressImageAsync(file.FullPath, file.DestinationPath, width, height);
 
-            ShowMessage("Resized " + ++compressCount + (filesToCompress.Count == 1 ? " image" : " images."), MessageType.DEFAULT);
+            ShowExecutionMessage(file);
         }
 
-        private async Task CompressImages()
+        private async Task CompressImageAsync(AppFile file)
         {
-            var compressTasks = new List<Task>();
+            await compressor.CompressImageAsync(file.FullPath, file.DestinationPath);
 
-            string fileName = "",
-                   destination = "";
+            ShowExecutionMessage(file);
+        }
 
-            filesToCompress.ForEach(file =>
+        private void ShowExecutionMessage(AppFile file)
+        {
+            if (maxCompressCount == compressCount)
             {
-                fileName = file.FullName;
-                destination = TextBox_OutputDirectory.Text + @"\" + file.Name;
-
-                compressTasks.Add(CompressImage(fileName, destination));
-            });
-
-            await Task.WhenAll(compressTasks);
-        }
-
-        private async Task CompressImage(string sourceLocation, string destinationFile)
-        {
-            await compressor.CompressImageAsync(sourceLocation, destinationFile);
-
-            ShowMessage("Compressed " + ++compressCount + (filesToCompress.Count == 1 ? " image" : " images."), MessageType.DEFAULT);
+                ShowMessage(MessageDictionary.GetCompletionMessage(maxCompressCount, compressCount), MessageType.SUCCESS);
+            }
+            else
+            {
+                ShowMessage(MessageDictionary.GetCompressedMessage(file.FileName, maxCompressCount, compressCount++), MessageType.DEFAULT);
+            }
         }
 
         private void ListBox_Items_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Uri uriSource = new Uri(filesToCompress[ListBox_Items.SelectedIndex].FullName, UriKind.Absolute);
+            Uri uriSource = new Uri(filesToCompress[ListBox_Items.SelectedIndex].FullPath, UriKind.Absolute);
 
             BitmapImage image = new BitmapImage();
             image.BeginInit();
@@ -253,6 +265,27 @@ namespace ImageCompressor
             image.EndInit();
 
             Image_Preview.Source = image;
+        }
+
+        private void MenuItem_Enable_Click(object sender, RoutedEventArgs e)
+        {
+            SetFilesEnabled(true);
+        }
+
+        private void MenuItem_Disable_Click(object sender, RoutedEventArgs e)
+        {
+            SetFilesEnabled(false);
+        }
+
+        private void SetFilesEnabled(bool enabled)
+        {
+            foreach (AppFile file in ListBox_Items.SelectedItems)
+            {
+                file.Enabled = enabled;
+                file.Foreground = enabled ? Brushes.Black : new SolidColorBrush(Color.FromArgb(255, 200, 200, 200));
+            }
+
+            ShowMessage(MessageDictionary.GetDisabledMessage(filesToCompress.Count, filesToCompress.Count(file => !file.Enabled)), MessageType.SUCCESS);
         }
 
         private void ShowMessage(string message, MessageType messageType)

@@ -32,9 +32,11 @@ namespace ImageCompressor.Main.Compressors
                 method = "cover",
                 width = width,
                 height = height
-            });
+            }).ToBuffer();
 
-            await resized.ToFile(destinationFile);
+            var compressed = Tinify.FromBuffer(await resized);
+
+            await compressed.ToFile(destinationFile);
         }
     }
 }

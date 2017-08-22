@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImageCompressor"
         mc:Ignorable="d"
-        Title="Image Compressor" Height="576" Width="1024" WindowStartupLocation="CenterScreen" FontFamily="Verdana Pro" FontSize="14">
+        Title="Image Compressor" Height="576" Width="1024" WindowStartupLocation="CenterScreen" FontFamily="Verdana Pro" FontSize="14" MinWidth="640" MinHeight="480">
     <Window.Resources>
 
         <Color x:Key="Theme-L5">#FFF4FCFC</Color>
@@ -112,7 +112,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
 
-                        <Border x:Name="Border" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="Border" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
                             <ContentPresenter />
                         </Border>
 
@@ -145,32 +145,32 @@
     <Grid Background="#FFFAFAFA">
 
         <Grid Margin="10,190,0,55" MinWidth="150" Background="White" HorizontalAlignment="Left" Width="450">
-            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
+            <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
             <TextBox x:Name="TextBox_Width" HorizontalAlignment="Left" Height="35" Margin="10,42,0,0" VerticalAlignment="Top" Width="90" Text="100" />
             <Label Content="Width" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
             <TextBox x:Name="TextBox_Height" HorizontalAlignment="Left" Height="35" Margin="105,42,0,0" VerticalAlignment="Top" Width="90" Text="100"/>
             <Label Content="Height" HorizontalAlignment="Left" Margin="105,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
             <CheckBox x:Name="CheckBox_Resize" Content="Resize Images" HorizontalAlignment="Left" Margin="200,61,0,0" VerticalAlignment="Top" Checked="CheckBox_Resize_CheckedChanged" IsChecked="True" Unchecked="CheckBox_Resize_CheckedChanged"/>
             <Grid Margin="10,82,10,10">
-                <Rectangle Fill="White" Stroke="#FFDBF5F4"/>
+                <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}"/>
                 <Label Content="Image Preview" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" VerticalAlignment="Top" />
                 <Image x:Name="Image_Preview" Margin="10,42,10,10" Stretch="None"/>
             </Grid>
         </Grid>
 
         <Grid Margin="465,10,10,55" Background="White">
-            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
-            <ListBox x:Name="ListBox_Items" Margin="10,42,10,10" BorderBrush="#FF4ACECA" ItemsSource="{Binding}" SelectionMode="Extended" SelectionChanged="ListBox_Items_SelectionChanged">
+            <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
+            <ListBox x:Name="ListBox_Items" Margin="10,42,10,10" BorderBrush="{StaticResource Brush_Theme}" ItemsSource="{Binding}" SelectionMode="Extended" SelectionChanged="ListBox_Items_SelectionChanged">
                 <ListBox.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Enable Selected Files"></MenuItem>
-                        <MenuItem Header="Disable Selected Files"></MenuItem>
+                        <MenuItem x:Name="MenuItem_Enable" Header="Enable Selected Files" Click="MenuItem_Enable_Click"></MenuItem>
+                        <MenuItem x:Name="MenuItem_Disable" Header="Disable Selected Files" Click="MenuItem_Disable_Click"></MenuItem>
                     </ContextMenu>
                 </ListBox.ContextMenu>
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name}"></TextBlock>
+                        <TextBlock Text="{Binding FileName}" Foreground="{Binding Foreground, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -178,26 +178,26 @@
         </Grid>
 
         <Grid Margin="10,10,0,0" MinWidth="150" HorizontalAlignment="Left" Width="450" Height="85" VerticalAlignment="Top">
-            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
-            <Label Content="Input Directory" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold"/>
+            <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
+            <Label Content="Input Folder" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold"/>
             <TextBox x:Name="TextBox_InputDirectory" Margin="10,42,50,10" />
             <Button x:Name="Button_InputDirectory" Content="..." Margin="405,42,10,10" Click="Button_InputDirectory_Click"/>
         </Grid>
 
         <Grid Margin="10,100,0,0" MinWidth="150" HorizontalAlignment="Left" Width="450" Height="85" VerticalAlignment="Top">
-            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
-            <Label Content="Output Directory" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold" />
+            <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
+            <Label Content="Output Folder" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold" />
             <TextBox x:Name="TextBox_OutputDirectory" Margin="10,42,50,10" />
             <Button x:Name="Button_OutputDirectory" Content="..." Margin="405,42,10,10" Click="Button_OutputDirectory_Click"/>
         </Grid>
 
         <Grid Margin="465,0,10,10" Background="White" Height="40" VerticalAlignment="Bottom">
-            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
+            <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
             <Label x:Name="Label_Message" Content="Choose a folder containing images to compress." HorizontalContentAlignment="Right" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,8,0"/>
         </Grid>
 
         <Grid Margin="10,0,0,10" Background="White" Height="40" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="450">
-            <Rectangle Fill="White" Stroke="#FFDBF5F4" Margin="0,0,0,0" />
+            <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
             <Button x:Name="Button_Compress" Content="Compress and Resize" VerticalAlignment="Bottom" Height="40" Click="Button_Compress_Click"/>
         </Grid>
 
