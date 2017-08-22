@@ -8,19 +8,35 @@
         Title="Image Compressor" Height="576" Width="1024" WindowStartupLocation="CenterScreen" FontFamily="Verdana Pro" FontSize="14">
     <Window.Resources>
 
-        <Color x:Key="Theme-l5">#FFF4FCFC</Color>
-        <Color x:Key="Theme-l4">#FFDBF5F4</Color>
-        <Color x:Key="Theme-l3">#FFB7EBEA</Color>
-        <Color x:Key="Theme-l2">#FF93E1DF</Color>
-        <Color x:Key="Theme-l1">#FF6FD8D4</Color>
+        <Color x:Key="Theme-L5">#FFF4FCFC</Color>
+        <Color x:Key="Theme-L4">#FFDBF5F4</Color>
+        <Color x:Key="Theme-L3">#FFB7EBEA</Color>
+        <Color x:Key="Theme-L2">#FF93E1DF</Color>
+        <Color x:Key="Theme-L1">#FF6FD8D4</Color>
         <Color x:Key="Theme">#FF4ACECA</Color>
-        <Color x:Key="Theme-d1">#FF36C6C1</Color>
-        <Color x:Key="Theme-d2">#FF30B0AC</Color>
-        <Color x:Key="Theme-d3">#FF2A9A96</Color>
-        <Color x:Key="Theme-d4">#FF248481</Color>
-        <Color x:Key="Theme-d5">#FF1E6E6B</Color>
+        <Color x:Key="Theme-D1">#FF36C6C1</Color>
+        <Color x:Key="Theme-D2">#FF30B0AC</Color>
+        <Color x:Key="Theme-D3">#FF2A9A96</Color>
+        <Color x:Key="Theme-D4">#FF248481</Color>
+        <Color x:Key="Theme-D5">#FF1E6E6B</Color>
+
+        <SolidColorBrush x:Key="Brush_Theme-L5" Color="{StaticResource Theme-L5}" />
+        <SolidColorBrush x:Key="Brush_Theme-L4" Color="{StaticResource Theme-L4}" />
+        <SolidColorBrush x:Key="Brush_Theme-L3" Color="{StaticResource Theme-L3}" />
+        <SolidColorBrush x:Key="Brush_Theme-L2" Color="{StaticResource Theme-L2}" />
+        <SolidColorBrush x:Key="Brush_Theme-L1" Color="{StaticResource Theme-L1}" />
+        <SolidColorBrush x:Key="Brush_Theme" Color="{StaticResource Theme}" />
+        <SolidColorBrush x:Key="Brush_Theme-D1" Color="{StaticResource Theme-D1}" />
+        <SolidColorBrush x:Key="Brush_Theme-D2" Color="{StaticResource Theme-D2}" />
+        <SolidColorBrush x:Key="Brush_Theme-D3" Color="{StaticResource Theme-D3}" />
+        <SolidColorBrush x:Key="Brush_Theme-D4" Color="{StaticResource Theme-D4}" />
+        <SolidColorBrush x:Key="Brush_Theme-D5" Color="{StaticResource Theme-D5}" />
 
         <Style TargetType="TextBox">
+
+            <Setter Property="Background" Value="#FFFFFF" />
+            
+            <Setter  Property="BorderBrush" Value="{StaticResource ResourceKey=Brush_Theme}" />
 
             <Setter Property="TextWrapping" Value="NoWrap" />
 
@@ -30,14 +46,14 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
 
-                        <Border x:Name="Border" BorderBrush="#FF4ACECA" BorderThickness="1">
+                        <Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" BorderThickness="1">
                             <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
                         </Border>
 
                         <ControlTemplate.Triggers>
 
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#FF248481" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource ResourceKey=Brush_Theme-D3}" />
                             </Trigger>
 
                             <Trigger Property="IsEnabled" Value="False">
@@ -56,7 +72,7 @@
 
             <Setter Property="Background" Value="#FFFFFFFF" />
 
-            <Setter Property="BorderBrush"  Value="#FF4ACECA" />
+            <Setter Property="BorderBrush"  Value="{StaticResource ResourceKey=Brush_Theme}" />
 
             <Setter Property="Cursor" Value="Hand" />
 
@@ -66,14 +82,18 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
 
-                        <Border x:Name="Border" BorderThickness="1" Background="#FFFFFFFF" BorderBrush="#FF4ACECA">
+                        <Border x:Name="Border" BorderThickness="1" Background="#FFFFFFFF" BorderBrush="{StaticResource ResourceKey=Brush_Theme}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
 
                         <ControlTemplate.Triggers>
 
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#FFDBF5F4" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=Brush_Theme-L4}" />
+                            </Trigger>
+
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource ResourceKey=Brush_Theme-D3}" />
                             </Trigger>
 
                         </ControlTemplate.Triggers>
@@ -99,11 +119,11 @@
                         <ControlTemplate.Triggers>
 
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#FFF4FCFC" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=Brush_Theme-L5}" />
                             </Trigger>
 
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#FFDBF5F4" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=Brush_Theme-L4}" />
                             </Trigger>
 
                         </ControlTemplate.Triggers>
@@ -113,6 +133,12 @@
             </Setter>
 
         </Style>
+
+        <ResourceDictionary x:Key="ColoursDictionary">
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style/AppStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
 
     </Window.Resources>
 

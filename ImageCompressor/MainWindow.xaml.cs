@@ -6,15 +6,20 @@ using System.Windows;
 using System.Windows.Controls;
 using Ookii.Dialogs.Wpf;
 using System.IO;
-using ImageCompressor.Main;
+using ImageCompressor.Main.Compressors;
 using System.Windows.Media.Imaging;
 using ImageCompressor.Main.Utilities;
 using System.Windows.Media;
+using TinifyAPI;
 
 namespace ImageCompressor
 {
     public partial class MainWindow : Window
     {
+        private readonly string API_KEY = "Yk8o9Lni6nYdv3vmc7j5cpAalBufDc_l";
+
+        private TinifyCompressor compressor;
+
         private List<FileInfo> filesToCompress;
 
         private int compressCount = 0;
@@ -25,6 +30,8 @@ namespace ImageCompressor
         public MainWindow()
         {
             InitializeComponent();
+
+            compressor = new TinifyCompressor(API_KEY);
 
             filesToCompress = new List<FileInfo>();
         }
@@ -50,9 +57,7 @@ namespace ImageCompressor
         {
             VistaFolderBrowserDialog folderDialog = new VistaFolderBrowserDialog();
 
-            var result = folderDialog.ShowDialog();
-
-            if (result == true)
+            if (folderDialog.ShowDialog().Value)
             {
                 TextBox_OutputDirectory.Text = folderDialog.SelectedPath;
             }
@@ -95,6 +100,7 @@ namespace ImageCompressor
         {
             if (!Directory.Exists(TextBox_InputDirectory.Text))
             {
+                TextBox_InputDirectory.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
                 ShowMessage("Input directory does not exist.", MessageType.ERROR);
                 return;
             }
@@ -110,24 +116,28 @@ namespace ImageCompressor
             {
                 if (!Utils.IsInt(TextBox_Width.Text))
                 {
+                    TextBox_Width.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
                     ShowMessage("Width must be a number.", MessageType.ERROR);
                     return;
                 }
 
                 if (Convert.ToInt32(TextBox_Width.Text) < 1 || Convert.ToInt32(TextBox_Width.Text) > 10000)
                 {
+                    TextBox_Width.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
                     ShowMessage("Width must be between 1 and 10,000, inclusive.", MessageType.ERROR);
                     return;
                 }
 
                 if (!Utils.IsInt(TextBox_Height.Text))
                 {
+                    TextBox_Height.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
                     ShowMessage("Height must be a number.", MessageType.ERROR);
                     return;
                 }
 
                 if (Convert.ToInt32(TextBox_Height.Text) < 1 || Convert.ToInt32(TextBox_Height.Text) > 10000)
                 {
+                    TextBox_Height.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
                     ShowMessage("Height must be between 1 and 10,000, inclusive.", MessageType.ERROR);
                     return;
                 }
@@ -144,13 +154,36 @@ namespace ImageCompressor
 
                 Image_Preview.Source = null;
 
-                if (CheckBox_Resize.IsChecked.Value)
+                try
                 {
-                    await ResizeImages();
+                    if (CheckBox_Resize.IsChecked.Value)
+                    {
+                        await ResizeImages();
+                    }
+                    else
+                    {
+                        await CompressImages();
+                    }
                 }
-                else
+                catch (AccountException ex)
                 {
-                    await CompressImages();
+                    ShowMessage("Account Exception. Verify API key and account limit. " + ex.Message, MessageType.ERROR);
+                }
+                catch (ClientException ex)
+                {
+                    ShowMessage("Client Exception. There was a problem with the source image." + ex.Message, MessageType.ERROR);
+                }
+                catch (ServerException ex)
+                {
+                    ShowMessage("Server Exception. A server error occured." + ex.Message, MessageType.ERROR);
+                }
+                catch (ConnectionException ex)
+                {
+                    ShowMessage("Server Exception. A server error occured." + ex.Message, MessageType.ERROR);
+                }
+                catch (System.Exception ex)
+                {
+                    ShowMessage("Exception. An error occured." + ex.Message, MessageType.ERROR);
                 }
             }
         }
@@ -161,28 +194,24 @@ namespace ImageCompressor
 
             string fileName = "",
                    destination = "";
-
-            dynamic options = new
-            {
-                method = "cover",
-                width = Convert.ToInt32(TextBox_Width.Text),
-                height = Convert.ToInt32(TextBox_Height.Text)
-            };
+            
+            int width = Convert.ToInt32(TextBox_Width.Text),
+                height = Convert.ToInt32(TextBox_Height.Text);
 
             filesToCompress.ForEach(file =>
             {
                 fileName = file.FullName;
                 destination = TextBox_OutputDirectory.Text + @"\" + file.Name;
 
-                resizeTasks.Add(ResizeImage(fileName, destination, options));
+                resizeTasks.Add(ResizeImage(fileName, destination, width, height));
             });
 
             await Task.WhenAll(resizeTasks);
         }
 
-        private async Task ResizeImage(string fileLocation, string destinationFile, dynamic options)
+        private async Task ResizeImage(string sourceLocation, string destinationFile, int width, int height)
         {
-            await Compressor.Instance.ResizeImageAsync(fileLocation, destinationFile, options);
+            await compressor.ResizeAndCompressImageAsync(sourceLocation, destinationFile, width, height);
 
             ShowMessage("Resized " + ++compressCount + (filesToCompress.Count == 1 ? " image" : " images."), MessageType.DEFAULT);
         }
@@ -205,9 +234,9 @@ namespace ImageCompressor
             await Task.WhenAll(compressTasks);
         }
 
-        private async Task CompressImage(string fileLocation, string destinationFile)
+        private async Task CompressImage(string sourceLocation, string destinationFile)
         {
-            await Compressor.Instance.CompressImageAsync(fileLocation, destinationFile);
+            await compressor.CompressImageAsync(sourceLocation, destinationFile);
 
             ShowMessage("Compressed " + ++compressCount + (filesToCompress.Count == 1 ? " image" : " images."), MessageType.DEFAULT);
         }
