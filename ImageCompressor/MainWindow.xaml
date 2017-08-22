@@ -20,6 +20,9 @@
         <Color x:Key="Theme-D4">#FF248481</Color>
         <Color x:Key="Theme-D5">#FF1E6E6B</Color>
 
+        <Color x:Key="Grey-L">#FFFAFAFA</Color>
+        <Color x:Key="Grey-D">#FFEFEFEF</Color>
+
         <SolidColorBrush x:Key="Brush_Theme-L5" Color="{StaticResource Theme-L5}" />
         <SolidColorBrush x:Key="Brush_Theme-L4" Color="{StaticResource Theme-L4}" />
         <SolidColorBrush x:Key="Brush_Theme-L3" Color="{StaticResource Theme-L3}" />
@@ -31,12 +34,15 @@
         <SolidColorBrush x:Key="Brush_Theme-D3" Color="{StaticResource Theme-D3}" />
         <SolidColorBrush x:Key="Brush_Theme-D4" Color="{StaticResource Theme-D4}" />
         <SolidColorBrush x:Key="Brush_Theme-D5" Color="{StaticResource Theme-D5}" />
+        
+        <SolidColorBrush x:Key="Brush_Grey-L" Color="{StaticResource Grey-L}" />
+        <SolidColorBrush x:Key="Brush_Grey-D" Color="{StaticResource Grey-D}" />
 
         <Style TargetType="TextBox">
 
             <Setter Property="Background" Value="#FFFFFF" />
             
-            <Setter  Property="BorderBrush" Value="{StaticResource ResourceKey=Brush_Theme}" />
+            <Setter Property="BorderBrush" Value="{StaticResource ResourceKey=Brush_Theme}" />
 
             <Setter Property="TextWrapping" Value="NoWrap" />
 
@@ -57,7 +63,7 @@
                             </Trigger>
 
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Border" Property="Background" Value="#FFEFEFEF" />
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=Brush_Grey-L}" />
                             </Trigger>
 
                         </ControlTemplate.Triggers>
@@ -96,6 +102,10 @@
                                 <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource ResourceKey=Brush_Theme-D3}" />
                             </Trigger>
 
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=Brush_Grey-L}" />
+                            </Trigger>
+
                         </ControlTemplate.Triggers>
 
                     </ControlTemplate>
@@ -126,6 +136,10 @@
                                 <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=Brush_Theme-L4}" />
                             </Trigger>
 
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=Brush_Grey-L}" />
+                            </Trigger>
+
                         </ControlTemplate.Triggers>
 
                     </ControlTemplate>
@@ -134,71 +148,70 @@
 
         </Style>
 
-        <ResourceDictionary x:Key="ColoursDictionary">
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Style/AppStyle.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-
     </Window.Resources>
 
-    <Grid Background="#FFFAFAFA">
+    <Grid Background="{DynamicResource Brush_Grey-D}">
 
         <Grid Margin="10,190,0,55" MinWidth="150" Background="White" HorizontalAlignment="Left" Width="450">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
             <TextBox x:Name="TextBox_Width" HorizontalAlignment="Left" Height="35" Margin="10,42,0,0" VerticalAlignment="Top" Width="90" Text="100" />
             <Label Content="Width" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
-            <TextBox x:Name="TextBox_Height" HorizontalAlignment="Left" Height="35" Margin="105,42,0,0" VerticalAlignment="Top" Width="90" Text="100"/>
+            <TextBox x:Name="TextBox_Height" HorizontalAlignment="Left" Height="35" Margin="105,42,0,0" VerticalAlignment="Top" Width="90" Text="100" />
             <Label Content="Height" HorizontalAlignment="Left" Margin="105,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
-            <CheckBox x:Name="CheckBox_Resize" Content="Resize Images" HorizontalAlignment="Left" Margin="200,61,0,0" VerticalAlignment="Top" Checked="CheckBox_Resize_CheckedChanged" IsChecked="True" Unchecked="CheckBox_Resize_CheckedChanged"/>
+            <CheckBox x:Name="CheckBox_Resize" Content="Resize Images" HorizontalAlignment="Left" Margin="200,61,0,0" VerticalAlignment="Top" Checked="CheckBox_Resize_CheckedChanged" IsChecked="True" Unchecked="CheckBox_Resize_CheckedChanged" />
+            
             <Grid Margin="10,82,10,10">
-                <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}"/>
+                <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" />
                 <Label Content="Image Preview" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" VerticalAlignment="Top" />
-                <Image x:Name="Image_Preview" Margin="10,42,10,10" Stretch="None"/>
+                <Image x:Name="Image_Preview" Margin="10,42,10,10" Stretch="None" />
             </Grid>
         </Grid>
 
         <Grid Margin="465,10,10,55" Background="White">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
+            
             <ListBox x:Name="ListBox_Items" Margin="10,42,10,10" BorderBrush="{StaticResource Brush_Theme}" ItemsSource="{Binding}" SelectionMode="Extended" SelectionChanged="ListBox_Items_SelectionChanged">
+                
                 <ListBox.ContextMenu>
                     <ContextMenu>
-                        <MenuItem x:Name="MenuItem_Enable" Header="Enable Selected Files" Click="MenuItem_Enable_Click"></MenuItem>
-                        <MenuItem x:Name="MenuItem_Disable" Header="Disable Selected Files" Click="MenuItem_Disable_Click"></MenuItem>
+                        <MenuItem x:Name="MenuItem_Enable" Header="Enable Selected Files" Click="MenuItem_Enable_Click" />
+                        <MenuItem x:Name="MenuItem_Disable" Header="Disable Selected Files" Click="MenuItem_Disable_Click" />
                     </ContextMenu>
                 </ListBox.ContextMenu>
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding FileName}" Foreground="{Binding Foreground, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+                        <TextBlock Text="{Binding FileName}" Foreground="{Binding Foreground, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                
             </ListBox>
-            <Label Content="Images" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top"/>
+            
+            <Label Content="Images" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
         </Grid>
 
         <Grid Margin="10,10,0,0" MinWidth="150" HorizontalAlignment="Left" Width="450" Height="85" VerticalAlignment="Top">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
-            <Label Content="Input Folder" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold"/>
+            <Label Content="Input Folder" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold" />
             <TextBox x:Name="TextBox_InputDirectory" Margin="10,42,50,10" />
-            <Button x:Name="Button_InputDirectory" Content="..." Margin="405,42,10,10" Click="Button_InputDirectory_Click"/>
+            <Button x:Name="Button_InputDirectory" Content="..." Margin="405,42,10,10" Click="Button_InputDirectory_Click" />
         </Grid>
 
         <Grid Margin="10,100,0,0" MinWidth="150" HorizontalAlignment="Left" Width="450" Height="85" VerticalAlignment="Top">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
             <Label Content="Output Folder" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold" />
             <TextBox x:Name="TextBox_OutputDirectory" Margin="10,42,50,10" />
-            <Button x:Name="Button_OutputDirectory" Content="..." Margin="405,42,10,10" Click="Button_OutputDirectory_Click"/>
+            <Button x:Name="Button_OutputDirectory" Content="..." Margin="405,42,10,10" Click="Button_OutputDirectory_Click" />
         </Grid>
 
         <Grid Margin="465,0,10,10" Background="White" Height="40" VerticalAlignment="Bottom">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
-            <Label x:Name="Label_Message" Content="Choose a folder containing images to compress." HorizontalContentAlignment="Right" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,8,0"/>
+            <Label x:Name="Label_Message" Content="Choose a folder containing images to compress." HorizontalContentAlignment="Right" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,8,0" />
         </Grid>
 
         <Grid Margin="10,0,0,10" Background="White" Height="40" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="450">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
-            <Button x:Name="Button_Compress" Content="Compress and Resize" VerticalAlignment="Bottom" Height="40" Click="Button_Compress_Click"/>
+            <Button x:Name="Button_Compress" Content="Compress and Resize" VerticalAlignment="Bottom" Height="40" Click="Button_Compress_Click" />
         </Grid>
 
     </Grid>

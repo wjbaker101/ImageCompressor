@@ -4,6 +4,7 @@ using ImageCompressor.Main.Utilities;
 using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace ImageCompressor
 
         private TinifyCompressor compressor = new TinifyCompressor(API_KEY);
 
-        private List<AppFile> filesToCompress = new List<AppFile>();
+        private ObservableCollection<AppFile> filesToCompress = new ObservableCollection<AppFile>();
 
         private int compressCount = 0,
                     maxCompressCount = 0;
@@ -71,7 +72,7 @@ namespace ImageCompressor
                      {
                          filesToCompress.Add(new AppFile(file, TextBox_OutputDirectory.Text));
                      });
-
+            
             ListBox_Items.ItemsSource = filesToCompress;
 
             ShowMessage(MessageDictionary.GetFoundMessage(filesToCompress.Count), MessageType.SUCCESS);
@@ -90,55 +91,51 @@ namespace ImageCompressor
             if (Button_Compress == null)
                 return;
 
-            if (CheckBox_Resize.IsChecked.Value)
-                Button_Compress.Content = "Compress and Resize";
-            else
-                Button_Compress.Content = "Compress";
+            Button_Compress.Content = (CheckBox_Resize.IsChecked.Value ? "Compress and Resize" : "Compress");
         }
 
         private async void Button_Compress_Click(object sender, RoutedEventArgs e)
         {
             if (TextBox_InputDirectory.Text.Length == 0 || !Directory.Exists(TextBox_InputDirectory.Text))
             {
-                TextBox_InputDirectory.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
-                ShowMessage("Input directory does not exist.", MessageType.ERROR);
+                ShowMessage("Input directory does not exist.", MessageType.ERROR, TextBox_InputDirectory);
                 return;
             }
 
-            DirectoryInfo directory = new DirectoryInfo(TextBox_OutputDirectory.Text);
-
-            if (!directory.Exists)
+            if (TextBox_OutputDirectory.Text.Length == 0)
             {
-                directory.Create();
+                ShowMessage("Output directory cannot be blank.", MessageType.ERROR, TextBox_OutputDirectory);
+                return;
+            }
+
+            if (!Directory.Exists(TextBox_OutputDirectory.Text))
+            {
+                (new DirectoryInfo(TextBox_OutputDirectory.Text)).Create();
             }
 
             if (CheckBox_Resize.IsChecked.Value)
             {
                 if (!Utils.IsInt(TextBox_Width.Text))
                 {
-                    TextBox_Width.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
-                    ShowMessage("Width must be a number.", MessageType.ERROR);
+                    ShowMessage("Width must be a number.", MessageType.ERROR, TextBox_Width);
                     return;
                 }
 
                 if (Convert.ToInt32(TextBox_Width.Text) < 1 || Convert.ToInt32(TextBox_Width.Text) > 10000)
                 {
-                    TextBox_Width.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
-                    ShowMessage("Width must be between 1 and 10,000, inclusive.", MessageType.ERROR);
+                    ShowMessage("Width must be between 1 and 10,000, inclusive.", MessageType.ERROR, TextBox_Width);
                     return;
                 }
 
                 if (!Utils.IsInt(TextBox_Height.Text))
                 {
-                    TextBox_Height.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
-                    ShowMessage("Height must be a number.", MessageType.ERROR);
+                    ShowMessage("Height must be a number.", MessageType.ERROR, TextBox_Height);
                     return;
                 }
 
                 if (Convert.ToInt32(TextBox_Height.Text) < 1 || Convert.ToInt32(TextBox_Height.Text) > 10000)
                 {
-                    TextBox_Height.BorderBrush = new SolidColorBrush(Message.GetColorFromType(MessageType.ERROR));
-                    ShowMessage("Height must be between 1 and 10,000, inclusive.", MessageType.ERROR);
+                    ShowMessage("Height must be between 1 and 10,000, inclusive.", MessageType.ERROR, TextBox_Height);
                     return;
                 }
             }
@@ -192,12 +189,30 @@ namespace ImageCompressor
 
             Image_Preview.Source = null;
 
-            ListBox_Items.IsEnabled = false;
+            SetCompressControlsEnabled(false);
         }
 
         private void PostExecution()
         {
-            ListBox_Items.IsEnabled = true;
+            SetCompressControlsEnabled(true);
+        }
+
+        private void SetCompressControlsEnabled(bool enabled)
+        {
+            List<Control> relatedControls = new List<Control>()
+            {
+                TextBox_InputDirectory,
+                Button_InputDirectory,
+                TextBox_OutputDirectory,
+                Button_OutputDirectory,
+                TextBox_Width,
+                TextBox_Height,
+                CheckBox_Resize,
+                Button_Compress,
+                ListBox_Items
+            };
+
+            relatedControls.ForEach(control => control.IsEnabled = enabled);
         }
 
         private async Task AlterImagesAsync(bool doResize)
@@ -207,7 +222,7 @@ namespace ImageCompressor
             int width = Convert.ToInt32(TextBox_Width.Text),
                 height = Convert.ToInt32(TextBox_Height.Text);
 
-            filesToCompress.ForEach(file =>
+            foreach (AppFile file in filesToCompress)
             {
                 if (file.Enabled)
                 {
@@ -220,9 +235,9 @@ namespace ImageCompressor
                         alterTasks.Add(CompressImageAsync(file));
                     }
 
-                    Task.Delay(10);
+                    await Task.Delay(10);
                 }
-            });
+            }
 
             await Task.WhenAll(alterTasks);
         }
@@ -255,6 +270,11 @@ namespace ImageCompressor
 
         private void ListBox_Items_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            int index = ListBox_Items.SelectedIndex;
+
+            if (index  < 0 || index > ListBox_Items.Items.Count)
+                return;
+
             Uri uriSource = new Uri(filesToCompress[ListBox_Items.SelectedIndex].FullPath, UriKind.Absolute);
 
             BitmapImage image = new BitmapImage();
@@ -288,11 +308,18 @@ namespace ImageCompressor
             ShowMessage(MessageDictionary.GetDisabledMessage(filesToCompress.Count, filesToCompress.Count(file => !file.Enabled)), MessageType.SUCCESS);
         }
 
-        private void ShowMessage(string message, MessageType messageType)
+        private void ShowMessage(string message, MessageType messageType, Control errorControl = null)
         {
-            Label_Message.Content = message;
+            SolidColorBrush brush = new SolidColorBrush(Message.GetColorFromType(messageType));
 
-            Label_Message.Foreground = new SolidColorBrush(Message.GetColorFromType(messageType));
+            Label_Message.Foreground = brush;
+
+            if (errorControl != null)
+            {
+                errorControl.BorderBrush = brush;
+            }
+
+            Label_Message.Content = message;
         }
     }
 }

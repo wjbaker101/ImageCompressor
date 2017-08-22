@@ -24,7 +24,7 @@ namespace ImageCompressor.Main.Files
             this.FileSize = file.Length;
             this.DestinationPath = destination + @"\" + FileName;
 
-            Foreground = Brushes.Black;
+            this.Foreground = Brushes.Black;
         }
 
         public SolidColorBrush Foreground
