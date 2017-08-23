@@ -34,14 +34,14 @@
         <SolidColorBrush x:Key="Brush_Theme-D3" Color="{StaticResource Theme-D3}" />
         <SolidColorBrush x:Key="Brush_Theme-D4" Color="{StaticResource Theme-D4}" />
         <SolidColorBrush x:Key="Brush_Theme-D5" Color="{StaticResource Theme-D5}" />
-        
+
         <SolidColorBrush x:Key="Brush_Grey-L" Color="{StaticResource Grey-L}" />
         <SolidColorBrush x:Key="Brush_Grey-D" Color="{StaticResource Grey-D}" />
 
         <Style TargetType="TextBox">
 
             <Setter Property="Background" Value="#FFFFFF" />
-            
+
             <Setter Property="BorderBrush" Value="{StaticResource ResourceKey=Brush_Theme}" />
 
             <Setter Property="TextWrapping" Value="NoWrap" />
@@ -154,24 +154,25 @@
 
         <Grid Margin="10,190,0,55" MinWidth="150" Background="White" HorizontalAlignment="Left" Width="450">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
-            <TextBox x:Name="TextBox_Width" HorizontalAlignment="Left" Height="35" Margin="10,42,0,0" VerticalAlignment="Top" Width="90" Text="100" />
-            <Label Content="Width" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
-            <TextBox x:Name="TextBox_Height" HorizontalAlignment="Left" Height="35" Margin="105,42,0,0" VerticalAlignment="Top" Width="90" Text="100" />
-            <Label Content="Height" HorizontalAlignment="Left" Margin="105,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
-            <CheckBox x:Name="CheckBox_Resize" Content="Resize Images" HorizontalAlignment="Left" Margin="200,61,0,0" VerticalAlignment="Top" Checked="CheckBox_Resize_CheckedChanged" IsChecked="True" Unchecked="CheckBox_Resize_CheckedChanged" />
-            
+            <TextBox x:Name="TextBox_Width" HorizontalAlignment="Left" Height="35" Margin="10,42,0,0" VerticalAlignment="Top" Width="90" Text="100" ToolTip="Width of the final image." />
+            <Label Content="Width" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" ToolTip="Width of the final image." />
+            <TextBox x:Name="TextBox_Height" HorizontalAlignment="Left" Height="35" Margin="105,42,0,0" VerticalAlignment="Top" Width="90" Text="100" ToolTip="Height of the final image." />
+            <Label Content="Height" HorizontalAlignment="Left" Margin="105,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" ToolTip="Height of the final image." />
+            <CheckBox x:Name="CheckBox_Resize" Content="Resize Images" HorizontalAlignment="Left" Margin="200,61,0,0" VerticalAlignment="Top" Checked="CheckBox_Resize_CheckedChanged" IsChecked="True" Unchecked="CheckBox_Resize_CheckedChanged" ToolTip="Tick to resize the image." />
+
             <Grid Margin="10,82,10,10">
                 <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" />
-                <Label Content="Image Preview" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" VerticalAlignment="Top" />
+                <Label Content="Image Preview" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" VerticalAlignment="Top" ToolTip="Preview of the currently selected image." />
                 <Image x:Name="Image_Preview" Margin="10,42,10,10" Stretch="None" />
             </Grid>
+            
         </Grid>
 
         <Grid Margin="465,10,10,55" Background="White">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
-            
+
             <ListBox x:Name="ListBox_Items" Margin="10,42,10,10" BorderBrush="{StaticResource Brush_Theme}" ItemsSource="{Binding}" SelectionMode="Extended" SelectionChanged="ListBox_Items_SelectionChanged">
-                
+
                 <ListBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem x:Name="MenuItem_Enable" Header="Enable Selected Files" Click="MenuItem_Enable_Click" />
@@ -184,24 +185,24 @@
                         <TextBlock Text="{Binding FileName}" Foreground="{Binding Foreground, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-                
+
             </ListBox>
-            
-            <Label Content="Images" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" />
+
+            <Label Content="Images" HorizontalAlignment="Left" Margin="10,10,0,0" FontWeight="Bold" Height="27" VerticalAlignment="Top" ToolTip="List of images found in the selected folder." />
         </Grid>
 
         <Grid Margin="10,10,0,0" MinWidth="150" HorizontalAlignment="Left" Width="450" Height="85" VerticalAlignment="Top">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
-            <Label Content="Input Folder" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold" />
-            <TextBox x:Name="TextBox_InputDirectory" Margin="10,42,50,10" />
-            <Button x:Name="Button_InputDirectory" Content="..." Margin="405,42,10,10" Click="Button_InputDirectory_Click" />
+            <Label Content="Input Folder" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold" ToolTip="Folder containing the original images." />
+            <TextBox x:Name="TextBox_InputDirectory" Margin="10,42,50,10" ToolTip="Folder containing the original images." />
+            <Button x:Name="Button_InputDirectory" Content="..." Margin="405,42,10,10" Click="Button_InputDirectory_Click" AutomationProperties.HelpText="Search for an input folder." ToolTip="Search for an input folder." />
         </Grid>
 
         <Grid Margin="10,100,0,0" MinWidth="150" HorizontalAlignment="Left" Width="450" Height="85" VerticalAlignment="Top">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
-            <Label Content="Output Folder" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold" />
-            <TextBox x:Name="TextBox_OutputDirectory" Margin="10,42,50,10" />
-            <Button x:Name="Button_OutputDirectory" Content="..." Margin="405,42,10,10" Click="Button_OutputDirectory_Click" />
+            <Label Content="Output Folder" HorizontalAlignment="Left" Margin="10,10,0,48" FontWeight="Bold" ToolTip="Folder for the final images." />
+            <TextBox x:Name="TextBox_OutputDirectory" Margin="10,42,50,10" ToolTip="Folder for the final images." />
+            <Button x:Name="Button_OutputDirectory" Content="..." Margin="405,42,10,10" Click="Button_OutputDirectory_Click" AutomationProperties.HelpText="Search for an output folder." ToolTip="Search for an output folder." />
         </Grid>
 
         <Grid Margin="465,0,10,10" Background="White" Height="40" VerticalAlignment="Bottom">
@@ -211,7 +212,7 @@
 
         <Grid Margin="10,0,0,10" Background="White" Height="40" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="450">
             <Rectangle Fill="White" Stroke="{StaticResource Brush_Theme-L4}" Margin="0,0,0,0" />
-            <Button x:Name="Button_Compress" Content="Compress and Resize" VerticalAlignment="Bottom" Height="40" Click="Button_Compress_Click" />
+            <Button x:Name="Button_Compress" Content="Compress and Resize" VerticalAlignment="Bottom" Height="40" Click="Button_Compress_Click" ToolTip="Execute the process." />
         </Grid>
 
     </Grid>

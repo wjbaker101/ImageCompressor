@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace ImageCompressor.Main.Files
 {
-    public class AppFile : INotifyPropertyChanged
+    public class ImageFile : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -12,17 +12,15 @@ namespace ImageCompressor.Main.Files
         public string FullPath { get; private set; }
         public bool Enabled { get; set; }
         public long FileSize { get; private set; }
-        public string DestinationPath { get; private set; }
 
         private SolidColorBrush _foreground { get; set; }
 
-        public AppFile(FileInfo file, string destination)
+        public ImageFile(FileInfo file, string destination)
         {
             this.FileName = file.Name;
             this.FullPath = file.FullName;
             this.Enabled = true;
             this.FileSize = file.Length;
-            this.DestinationPath = destination + @"\" + FileName;
 
             this.Foreground = Brushes.Black;
         }
